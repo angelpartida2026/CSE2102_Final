@@ -1,71 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import quizPageStyle from '../QuizPageStyle';
-
 import my_state from './my_state';
+import my_questions from '../model/basic_questions.json';
 
-import  my_questions from '../model/basic_questions.json';
-import { incrementScore, dontIncrementScore, calculateTotal } from '../controllers/scoring';
+const Quiz = () => {
+    const [score, setScore] = useState(0);
+    const [count, setCount] = useState(0);
+    const navigate = useNavigate();
 
-
-class Quiz extends React.Component {
-
-    state = {
-        score: 0,
-        count: 0
+    const incrementScore = () => {
+        setScore((prevScore) => prevScore + 1);
+        setCount((prevCount) => prevCount + 1);
     };
-
-    incrementScore = () => {
-        this.setState((prevState) => ({
-            score: incrementScore(prevState.score),
-            count: prevState.count + 1
-        }));
-        alert("You are correct!"); // could be executed before the setStates are done!
-    };
-
-    dontIncrementScore = () => {
-        this.setState((prevState) => ({
-            count: prevState.count + 1
-        }));
-        alert("Sorry - not correct");
-    };
-
-    handleSubmit = () => {
-        my_state.my_score = this.state.score;
-        my_state.my_count = this.state.count;
     
-        alert(`Total score: ${this.state.score}/${this.state.count}`);
-        window.location.href = '/results'; // Navigate to ResultsPage
-    };      
+    const dontIncrementScore = () => {
+        setCount((prevCount) => prevCount + 1);
+    };
     
-    render() {
-        return(
-           <div style={quizPageStyle}>
+    const handleSubmit = () => {
+        navigate('/results', { state: { score, count } });
+    };
+    
+    
+    return (
+        <div style={quizPageStyle}>
             <h1>My Questions</h1>
-                {my_questions.map((quest) => (
-                <div> 
+            {my_questions.map((quest) => (
+                <div key={quest["id"]}>
                     <h2>{quest["question"]}</h2>
-                        {quest["answers"].map((ans) => (
-                            <div>
-                                <label>
-                                <input  
-                                        type = "radio"
-                                        name = { quest["id"] }
-                                        key = { quest["id"] }
-                                        onClick = { ans["isCorrect"] ? this.incrementScore : this.dontIncrementScore }
-                                        value = { ans["isCorrect"] } /> 
-                                    { ans["answer"] }
-                                </label> 
-                                <br />
-                            </div>
-                        ))}
-                    
+                    {quest["answers"].map((ans, index) => (
+                        <div key={index}>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name={quest["id"]}
+                                    onClick={ans["isCorrect"] ? incrementScore : dontIncrementScore}
+                                    value={ans["isCorrect"]}
+                                />
+                                {ans["answer"]}
+                            </label>
+                            <br />
+                        </div>
+                    ))}
                 </div>
-                ))}
-                 <br />
-                <button onClick={this.handleSubmit} >Done</button>
+            ))}
+            <br />
+            <button onClick={handleSubmit}>Done</button>
         </div>
-        );
-    }
-}
+    );
+};
 
 export default Quiz;
