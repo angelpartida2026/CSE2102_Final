@@ -30,12 +30,12 @@ class Quiz extends React.Component {
     };
 
     handleSubmit = () => {
-        const { score, count } = calculateTotal(this.state.score, this.state.count);
-        my_state.my_score = score;
-        my_state.my_count = count;
-        
-        alert(`Total score: ${score}/${count}`);
-    };    
+        my_state.my_score = this.state.score;
+        my_state.my_count = this.state.count;
+    
+        alert(`Total score: ${this.state.score}/${this.state.count}`);
+        window.location.href = '/results'; // Navigate to ResultsPage
+    };      
     
     render() {
         return(
